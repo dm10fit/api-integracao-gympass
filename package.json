@@ -1,0 +1,26 @@
+{
+  "name": "integracaogympass",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=.env.production node src/server.js",
+    "dev": "cross-env NODE_ENV=.env.dev nodemon src/server.js"
+  },
+  "author": "Eder Costa",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.3",
+    "body-parser": "^1.20.2",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "knex": "^3.1.0",
+    "mysql2": "^3.11.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
