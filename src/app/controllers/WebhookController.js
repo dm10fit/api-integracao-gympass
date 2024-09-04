@@ -4,6 +4,7 @@ const ClienteModel = require('../model/ClienteModel');
 const TurmaModel = require('../model/TurmaModel');
 const AlunoModel = require('../model/AlunoModel');
 const AcessoService = require('../services/AcessoService');
+const CheckinService = require('../services/CheckinService');
 
 class WebhookController {
     constructor() {
@@ -54,8 +55,27 @@ class WebhookController {
             unique_token: data.user.unique_token
         });
 
+        //envia post no gympass que foi feito o checkin
+        const checkinService = new CheckinService();
+        const responseCheckin = await checkinService.ValidateCheckin({
+            gympass_id: data.user.unique_token,
+            gym_id: data.gym.id
+        });
+
+        if(responseCheckin.metadata.total !== 1){
+            return res.status(500).json({ error: 'erro ao validar no gympass' });
+        }
+
+        //da baixa na reserva
+        const turmaModel = new TurmaModel(clienteDbConnection);
+        await turmaModel.updateGradeAlunoPresensa({
+            Presenca: 'S',
+            gympass_bookingnumber: data.booking.booking_number
+        });
+
+        //da acesso a catraca da academia e gera a frequencia
         const acessoService = new AcessoService();
-        const responseCatraca = acessoService.acessoCatraca({
+        const responseCatraca = await acessoService.acessoCatraca({
             codigoaluno: dadosAlunno.RA,
             xcliente: pegaNomeDb.NomeCliente,
             usr_filial: 1
@@ -64,7 +84,8 @@ class WebhookController {
         res.status(200).json({ message: 'Evento de check-in recebido' });
     }
 
-    async handleBookingRequested(req, res) {
+    async handleBookingRequested(req, res, next) {
+
         if (!this.verifySignature(req)) {
             return res.status(403).json({ error: 'Assinatura inválida' });
         }
@@ -88,33 +109,35 @@ class WebhookController {
             return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
         }
 
+        //pega os dados do aluno
         const alunoModel = new AlunoModel(clienteDbConnection);
         const dadosAlunno = await alunoModel.getAluno({
             unique_token: data.user.unique_token
         });
-
         if (!dadosAlunno) {
             return res.status(500).json({ error: 'Aluno não encontrado' });
         }
 
+        //localiza em qual turma o aluno esta localizado
         const turmaModel = new TurmaModel(clienteDbConnection);
-
         const getTurmaGrade = await turmaModel.getTurmaGrade({
             gympass_classid: data.slot.id,
             gympass_slotid: data.slot.class_id
         });
 
-        const updateTurmaGradeAluno = await turmaModel.updateGradeAlunoCancela({
-            gympass_bookingnumber: data.slot.booking_number,
-            Presenca: 'cancelada',
-            Sequencia: getTurmaGrade.Sequencia
+        //adiciona a grade da turma do aluno
+        const createGradeTurmaAluno = await turmaModel.createGradeTurmaAluno({
+            CodGrade: getTurmaGrade.Sequencia,
+            Aluno: dadosAlunno.ra ,
+            AgendadoPor: 'A', 
+            gympass_bookingnumber: data.slot.booking_number
         });
 
-        if (!updateTurmaGradeAluno) {
-            return res.status(500).json({ error: 'Falha na solicitação de cancelamento na reserva no banco de dados' });
+        if (!createGradeTurmaAluno) {
+            return res.status(500).json({ error: 'Falha na solicitação na reserva no banco de dados' });
         }
 
-        res.status(200).json({ message: 'Evento de cancelamento de solicitação de reserva recebido' });
+        res.status(200).json({ message: 'Evento de solicitação de reserva recebido' });
     }
 
     async handleBookingCanceled(req, res) {
@@ -141,30 +164,29 @@ class WebhookController {
             return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
         }
 
+        //pega os dados do aluno
         const alunoModel = new AlunoModel(clienteDbConnection);
         const dadosAlunno = await alunoModel.getAluno({
             unique_token: data.user.unique_token
         });
-
         if (!dadosAlunno) {
             return res.status(500).json({ error: 'Aluno não encontrado' });
         }
 
+        //localiza a turma do aluno
         const turmaModel = new TurmaModel(clienteDbConnection);
-
         const getTurmaGrade = await turmaModel.getTurmaGrade({
             gympass_classid: data.slot.id,
             gympass_slotid: data.slot.class_id
         });
 
-        const updateTurmaGradeAluno = await turmaModel.agendarTurma({
-            gympass_bookingnumber: data.slot.booking_number,
-            Presenca: 'S',
-            AgendadoPor: 'n sei ainda',
-            Sequencia: getTurmaGrade.Sequencia
+        //exclui a grade da turma do aluno
+        const deleteGradeTurma = await turmaModel.deleteGradeTurma({
+            Sequencia: getTurmaGrade.Sequencia,
+            gympass_bookingnumber: data.slot.booking_number
         });
 
-        if (!updateTurmaGradeAluno) {
+        if (!deleteGradeTurma) {
             return res.status(500).json({ error: 'Falha na solicitação de reserva no banco de dados' });
         }
 

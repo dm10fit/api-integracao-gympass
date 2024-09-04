@@ -1,6 +1,6 @@
 module.exports = (app) => {
     app.use("/aulas", require("./aulas-route")); 
-    app.use("/slot", require("./reserva-route"));
+    app.use("/slot", require("./slots-router"));
     app.use("/reserva", require("./reserva-route"));
     app.use("/produtos", require("./produtos-route"));
     app.use("/checkin", require("./checkin-route"));

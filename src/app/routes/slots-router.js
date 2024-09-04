@@ -1,30 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const SlotsController = require("../controllers/SlotsController");
-const authChurch = require("../../config/authenticate");
 
 router.post('/', 
-    authChurch.Authenticate, 
     SlotsController.CreateSlot);
 
 router.get('/', 
-    authChurch.Authenticate, 
     SlotsController.ListSlot);
 
-router.get('/:gym_id/:class_id/:slot_id', 
-    authChurch.Authenticate, 
+router.get('/:gym_id/:class_id/:slot_id',
     SlotsController.GetSlot);
 
-router.put('/:id', 
-    authChurch.Authenticate, 
+router.put('/:gym_id/:class_id/:slot_id', 
     SlotsController.UpdateSlot);
 
-router.patch('/:id', 
-    authChurch.Authenticate, 
+router.patch('/:gym_id/:class_id/:slot_id', 
     SlotsController.PatchSlot);
 
-router.delete('/deletarslot/:gym_id/:class_id/:slot_id', 
-    authChurch.Authenticate, 
+router.delete('/deletarslot/:gym_id/:class_id/:slot_id',
     SlotsController.DeleteSlot);
 
 module.exports = router;

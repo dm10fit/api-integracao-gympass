@@ -25,6 +25,20 @@ SELECT Codigo FROM tblturmas WHERE gympass_classid = ?`, [data.class_id]);
         return result;
     }
 
+    async createGradeTurmaAluno(data) {
+        const [result] = await this.conn.raw(`INSERT INTO  tblturmasgradealunos ( CodGrade,Aluno,AgendadoPor,gympass_bookingnumber)
+VALUES (?,?,?,?,?)`, [data.CodGrade, data.Aluno, data.AgendadoPor, data.gympass_bookingnumber]);
+
+            return result;
+    }
+
+    async deleteGradeTurma(data){
+        const [result] = await this.conn.raw(`DELETE FROM  tblturmasgradealunos
+WHERE Sequencia = ? AND gympass_bookingnumber = ?`, [data.Sequencia, data.gympass_bookingnumber]);
+
+        return result;
+    }
+
     async updateGradeAluno(data) {
         const [result] = await this.conn.raw(`UPDATE  tblturmasgradealunos SET  Presenca = ?, AgendadoPor = ?, gympass_bookingnumber = ? WHERE Sequencia = ?`, [data.Presenca, data.AgendadoPor, data.gympass_bookingnumber, data.Sequencia]);
 
@@ -33,6 +47,12 @@ SELECT Codigo FROM tblturmas WHERE gympass_classid = ?`, [data.class_id]);
 
     async updateGradeAlunoCancela(data) {
         const [result] = await this.conn.raw(`UPDATE  tblturmasgradealunos SET  Presenca = ?, gympass_bookingnumber = ? WHERE Sequencia = ?`, [data.Presenca, data.gympass_bookingnumber, data.Sequencia]);
+
+        return result;
+    }
+
+    async updateGradeAlunoPresensa(data) {
+        const [result] = await this.conn.raw(`UPDATE  tblturmasgradealunos SET  Presenca = ? WHERE gympass_bookingnumber = ?`, [data.Presenca, data.gympass_bookingnumber]);
 
         return result;
     }

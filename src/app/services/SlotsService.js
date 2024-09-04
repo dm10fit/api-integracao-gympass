@@ -131,7 +131,7 @@ class SlotsService {
         }
     }
 
-    async updateSlot(data) {
+    async updateSlot(data, params) {
         const dados = {
             occur_date: data.occur_date,
             room: data.room,
@@ -154,7 +154,7 @@ class SlotsService {
         try {
             const response = await axios({
                 method: 'PUT',
-                url: `${url}/booking/v1/gyms/${data.gym_id}/classes/${data.class_id}/slots/${data.slot_id}`,
+                url: `${url}/booking/v1/gyms/${params.gym_id}/classes/${params.class_id}/slots/${params.slot_id}`,
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${authToken}`

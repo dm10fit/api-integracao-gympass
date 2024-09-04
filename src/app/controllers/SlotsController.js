@@ -94,7 +94,7 @@ class SlotsController {
         try {
             const data = req.body;
 
-            const response = await slotsService.updateSlot(data);
+            const response = await slotsService.updateSlot(data, req.params);
 
             if (response.error) {
                 return res.status(response.error.status || 400).json({ error: response.error.message || 'Erro ao Atualizar Slot' });
