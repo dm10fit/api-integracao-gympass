@@ -6,15 +6,17 @@ require('dotenv').config({
   path: envFile
 });
 
-// Configuração do Knex
-const db = knex({
-  client: 'mysql2',
-  connection: {
-    host: process.env.host,
-    user: process.env.userbd,
-    password: process.env.pswbd,
-    database: process.env.nomebd
-  }
-});
+// Função para configurar o Knex com o banco de dados passado como parâmetro
+const createKnexInstance = (databaseName) => {
+  return knex({
+    client: 'mysql2',
+    connection: {
+      host: process.env.host,
+      user: process.env.userbd,
+      password: process.env.pswbd,
+      database: databaseName || process.env.nomebd  // Usa o banco de dados passado ou o padrão do .env
+    }
+  });
+};
 
-module.exports = db;
+module.exports = createKnexInstance;

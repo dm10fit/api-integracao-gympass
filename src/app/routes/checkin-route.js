@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const CheckinController = require("../controllers/CheckinController");
-const authChurch = require("../../config/authenticate");
+const CheckinController = require("../controllers/CheckinController"); 
 
 
-router.post("/",  
-    authChurch.Authenticate, 
+router.post("/",   
     CheckinController.ValidarCheckin);
 
 module.exports = router;

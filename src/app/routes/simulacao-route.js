@@ -1,20 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const SimulacaoController = require("../controllers/SimulacaoController");
-const authChurch = require("../../config/authenticate");
+const SimulacaoController = require("../controllers/SimulacaoController"); 
 
-router.post('/pedido-reserva', 
-    authChurch.Authenticate, 
+router.post('/pedido-reserva',  
     SimulacaoController.BookingRequest
 );
 
-router.post('/pedido-cancelar',
-    authChurch.Authenticate, 
+router.post('/pedido-cancelar', 
     SimulacaoController.BookingCancel
 )
 
-router.post('/Check-in',
-    authChurch.Authenticate, 
+router.post('/Check-in', 
     SimulacaoController.Checkin
 )
 
