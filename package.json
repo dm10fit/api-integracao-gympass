@@ -5,7 +5,7 @@
   "main": "./src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=.env.production node src/server.js",
+    "start": "env NODE_ENV=.env.production node src/server.js",
     "dev": "cross-env NODE_ENV=.env.dev nodemon src/server.js"
   },
   "author": "Eder Costa",
