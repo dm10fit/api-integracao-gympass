@@ -51,7 +51,7 @@ class AulasService {
         try {
             const options = {
                 method: 'GET',
-                url: `${url}/setup/v1/gyms/${data}/products`,
+                url: `${url}/setup/v1/gyms/${data}/classes`,
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${authToken}`
