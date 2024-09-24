@@ -25,8 +25,7 @@ class AulasService {
                 method: 'POST',
                 url: `${url}/booking/v1/gyms/${data.gym_id}/classes`,
                 headers: {
-                    Authorization: `Bearer ${authToken}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${authToken}`
                 },
                 data: dados,
                 maxBodyLength: Infinity
