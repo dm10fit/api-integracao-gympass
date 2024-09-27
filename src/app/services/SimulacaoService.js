@@ -31,12 +31,8 @@ class SimulacaoService {
             return response.data;
 
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [POST /gyms/${data.gym_id}/simulate/bookings]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição:`, error.message);
-            }
-            throw error;
+            
+            return  error.response.data;
         }
 
     }
@@ -60,12 +56,8 @@ class SimulacaoService {
             return response.data;
 
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [POST /gyms/${data.gym_id}/simulate/bookings/${data.booking}/cancel]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição:`, error.message);
-            }
-            throw error;
+          
+            return  error.response.data;
         }
 
     }
@@ -95,12 +87,8 @@ class SimulacaoService {
             return response.data;
 
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [POST /gyms/${data.gym_id}/simulate/checkins]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição:`, error.message);
-            }
-            throw error;
+          
+            return  error.response.data;
         }
     }
 

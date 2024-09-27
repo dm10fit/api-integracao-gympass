@@ -5,7 +5,7 @@
   "main": "./src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "env NODE_ENV=.env.production node src/server.js",
+    "start": "cross-env NODE_ENV=.env.production node src/server.js",
     "dev": "cross-env NODE_ENV=.env.dev nodemon src/server.js"
   },
   "author": "Eder Costa",
@@ -21,6 +21,7 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.4"
   }
 }

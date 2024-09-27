@@ -37,12 +37,8 @@ class AulasService {
             return response.data;
 
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [POST /booking/v1/gyms/${data.gym_id}/classes]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição:`, error.message);
-            }
-            throw error;
+            
+            return  error.response.data;
         }
     }
 
@@ -50,7 +46,7 @@ class AulasService {
         try {
             const options = {
                 method: 'GET',
-                url: `${url}/setup/v1/gyms/${data}/classes`,
+               url: `${url}/setup/v1/gyms/${data}/classes`,
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${authToken}`
@@ -64,12 +60,8 @@ class AulasService {
             return response.data;
 
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [GET /setup/v1/gyms/${data}/products]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição:`, error.message);
-            }
-            throw error;
+            
+            return  error.response.data;
         }
     }
 
@@ -112,8 +104,7 @@ class AulasService {
             bookable: data.reservavel,
             visible: data.visivel,
             reference: data.reference,
-            product_id: data.product_id,
-            categories: [data.categories]
+            product_id: data.product_id
         };
 
         try {
@@ -135,12 +126,8 @@ class AulasService {
             return response.data;
             
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [PUT /booking/v1/gyms/${data.gym_id}/classes/${data.class_id}]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição:`, error.message);
-            }
-            throw error;
+           
+            return  error.response.data;
         }
     }
 }

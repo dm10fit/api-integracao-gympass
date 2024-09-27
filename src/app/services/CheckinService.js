@@ -32,12 +32,8 @@ class CheckinService {
             console.log(JSON.stringify(response.data, null, 2));
             return response.data;
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [${method.toUpperCase()} ${path}]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição [${method.toUpperCase()} ${path}]:`, error.message);
-            }
-            throw error;
+            
+            return  error.response.data;
         }
     }
 }

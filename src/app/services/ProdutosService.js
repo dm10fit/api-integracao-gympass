@@ -7,11 +7,13 @@ const authToken = process.env.AUTH_TOKEN;
 class ProdutosService {
 
     async getProdutos(gym_id) { 
-        
+        const method = 'GET'; 
+        const path = `/setup/v1/gyms/${gym_id}/products`; 
+
         try {
             const response = await axios({
-                method: 'GET',
-                url: `${url}/setup/v1/gyms/${gym_id}/products`,
+                method: method,
+                url: `${url}${path}`,
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${authToken}`,
@@ -23,12 +25,8 @@ class ProdutosService {
             console.log(JSON.stringify(response.data, null, 2));
             return response.data;
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [${method} ${path}]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição [${method} ${path}]:`, error.message);
-            }
-            throw error;
+            
+            return  error.response.data;
         }
     }
 }

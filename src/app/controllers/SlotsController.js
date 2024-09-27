@@ -30,7 +30,7 @@ class SlotsController {
             };
 
             const response = await slotsService.getSlot(data);
-            
+            console.log(response.status)
             if (response.error) {
                 return res.status(response.error.status || 400).json({ error: response.error.message || 'Erro ao Consultar Slot' });
             }
@@ -92,6 +92,11 @@ class SlotsController {
 
     async UpdateSlot(req, res, next) {
         try {
+
+            req.body.gym_id = req.params.gym_id;
+            req.body.slot_id = req.params.slot_id;
+            req.body.class_id = req.params.class_id;
+
             const data = req.body;
 
             const response = await slotsService.updateSlot(data, req.params);
@@ -109,8 +114,13 @@ class SlotsController {
 
     async PatchSlot(req, res, next) {
         try {
-            const data = req.body;
 
+            req.body.gym_id = req.params.gym_id;
+            req.body.slot_id = req.params.slot_id;
+            req.body.class_id = req.params.class_id;
+
+            const data = req.body;
+            console.log(data)
             const response = await slotsService.patchSlot(data);
 
             if (response.error) {
