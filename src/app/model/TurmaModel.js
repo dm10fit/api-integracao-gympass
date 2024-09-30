@@ -16,26 +16,31 @@ VALUES ( 'Titulo','Aluno', 'Data','Hora', 'HoraFim', 'Sala', 'Profissional', 'Si
         const [result] = await this.conn.raw(`
 SELECT Codigo FROM tblturmas WHERE gympass_classid = ?`, [data.class_id]);
 
-        return result
+        return result[0]
     }
 
     async getTurmaGrade(data) {
+
+
         const [result] = await this.conn.raw(`select Sequencia, Turma from tblturmasgrade where gympass_classid = ? and gympass_slotid = ?`, [data.gympass_classid, data.gympass_slotid]);
+    
+
+        return result[0];
+    }
+
+    async createGradeTurmaAluno(data) {
+ 
+        const [result] = await this.conn.raw(`INSERT INTO  tblturmasgradealunos ( CodGrade,Aluno,AgendadoPor,gympass_bookingnumber)
+VALUES (?,?,?,?)`, [data.CodGrade, data.Aluno, data.AgendadoPor, data.gympass_bookingnumber]);
 
         return result;
     }
 
-    async createGradeTurmaAluno(data) {
-        const [result] = await this.conn.raw(`INSERT INTO  tblturmasgradealunos ( CodGrade,Aluno,AgendadoPor,gympass_bookingnumber)
-VALUES (?,?,?,?,?)`, [data.CodGrade, data.Aluno, data.AgendadoPor, data.gympass_bookingnumber]);
-
-            return result;
-    }
-
     async deleteGradeTurma(data){
-        const [result] = await this.conn.raw(`DELETE FROM  tblturmasgradealunos
-WHERE Sequencia = ? AND gympass_bookingnumber = ?`, [data.Sequencia, data.gympass_bookingnumber]);
-
+ 
+        const [result] = await this.conn.raw(`DELETE FROM tblturmasgradealunos
+WHERE CodGrade = ? AND gympass_bookingnumber = ?`, [data.Sequencia, data.gympass_bookingnumber]);
+       
         return result;
     }
 

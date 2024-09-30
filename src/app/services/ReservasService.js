@@ -14,11 +14,13 @@ class ReservasService {
             virtual_class_url: data.virtual_class_url
         };
 
+        const method = 'PATCH';
+        const path = `/booking/v1/gyms/${data.gym_id}/bookings/${data.booking_number}`;
+        
         try {
-             
             const response = await axios({
-                method: 'PATCH',
-                url: `${url}/booking/v1/gyms/${data.gym_id}/bookings/${data.booking_number}`,
+                method: method,
+                url: `${url}${path}`,
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${authToken}`
@@ -28,15 +30,17 @@ class ReservasService {
             });
 
             console.log(JSON.stringify(response.data, null, 2));
-
             return response.data;
 
         } catch (error) {
-            
-            return  error.response.data;
+            if (error.response) {
+                console.error(`Erro [${method} ${path}]:`, error.response.status, error.response.data);
+            } else {
+                console.error(`Erro ao realizar a requisição [${method} ${path}]:`, error.message);
+            }
+            throw error;
         }
     }
-
 }
 
 module.exports = ReservasService;

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const WebhookController = require("../controllers/WebhookController");
 
+router.post("/checkin", WebhookController.handleCheckin.bind(WebhookController));
 router.post("/requested", WebhookController.handleBookingRequested.bind(WebhookController));
 router.post("/cancelation", WebhookController.handleBookingCanceled.bind(WebhookController));
 router.post("/lateCancelation", WebhookController.handleBookingCanceled.bind(WebhookController));

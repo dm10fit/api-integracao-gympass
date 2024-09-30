@@ -7,10 +7,13 @@ class ClienteModel {
       }
 
     async pegaNomeDb(data){
-        const [result] = await this.conn.raw(`SELECT NomeBD, NomeCliente FROM tblclienteacesso WHERE gympass_gymid = ?`, [data.id]);
 
-        return result;
+        const [result] = await this.conn.raw(`SELECT NomeBD, NomeCliente FROM tblclienteacesso WHERE gympass_gymid = ?`, [data.id]);
+  
+        return result[0];
     }
+
+    
 }
 
 module.exports = ClienteModel;

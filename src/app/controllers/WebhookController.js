@@ -12,12 +12,13 @@ class WebhookController {
     }
 
     // Método para verificar a assinatura do webhook
-    verifySignature(req) {
-        const signature = req.headers['x-gympass-signature'];
+    verifySignature(req) { 
+        const signature = req.headers['x-gympass-signature']; 
         const body = JSON.stringify(req.body);
-        const hmac = crypto.createHmac('sha256', this.secret); // Usando SHA-256 para consistência com o código PHP
-        const digest = hmac.update(body).digest('hex').toUpperCase();
-        return signature === digest;
+        const hmac = crypto.createHmac('sha1', this.secret); 
+        const digest = hmac.update(body).digest('hex').toUpperCase(); 
+      
+        return signature === digest; 
     }
 
     async handleCheckin(req, res, next) {
@@ -27,24 +28,20 @@ class WebhookController {
 
         const data = req.body;
 
-        const db = await connectionDB();
-        if (!db) {
-            throw new Error('Falha ao obter conexão com o banco de dados');
-        }
-
         const dbConnection = await connectionDB('dm10fitaccess');
         const clienteModel = new ClienteModel(dbConnection);
 
         const pegaNomeDb = await clienteModel.pegaNomeDb({
-            id: data.id
+            id: data.event_data.gym.id
         });
 
         if (!pegaNomeDb) {
             return res.status(404).json({ error: 'Banco de dados do cliente não encontrado' });
         }
+ 
 
         // Trocar a conexão para o banco de dados do cliente
-        const clienteDbConnection = await connectionDB(pegaNomeDb.nomeDB);
+        const clienteDbConnection = await connectionDB(pegaNomeDb.NomeBD);
         if (!clienteDbConnection) {
             return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
         }
@@ -52,34 +49,68 @@ class WebhookController {
         // Pega os dados do aluno
         const alunoModel = new AlunoModel(clienteDbConnection);
         const dadosAlunno = await alunoModel.getAluno({
-            unique_token: data.user.unique_token
+            unique_token: data.event_data.user.unique_token
         });
 
         //envia post no gympass que foi feito o checkin
-        const checkinService = new CheckinService();
+       /* const checkinService = new CheckinService();
         const responseCheckin = await checkinService.ValidateCheckin({
-            gympass_id: data.user.unique_token,
-            gym_id: data.gym.id
+            gympass_id: data.event_data.user.unique_token,
+            gym_id: data.event_data.gym.id
         });
 
         if(responseCheckin.metadata.total !== 1){
             return res.status(500).json({ error: 'erro ao validar no gympass' });
         }
-
         //da baixa na reserva
         const turmaModel = new TurmaModel(clienteDbConnection);
         await turmaModel.updateGradeAlunoPresensa({
             Presenca: 'S',
             gympass_bookingnumber: data.booking.booking_number
-        });
+        });*/
+
 
         //da acesso a catraca da academia e gera a frequencia
-        const acessoService = new AcessoService();
-        const responseCatraca = await acessoService.acessoCatraca({
+
+        const resultConf = await alunoModel.catracaConf();
+
+        let sqlbusca;
+        let buscaapi;
+         
+        if (pegaNomeDb.NomeCliente !== 18215) {
+            
+            if (resultConf.DiasLiberacaoCatraca === 'S') {
+               
+                sqlbusca = `SELECT RA FROM tblalunos WHERE CartaoAcesso = '${dadosAlunno.CartaoAcesso}'`; 
+            } else {
+               
+                sqlbusca = `SELECT RA FROM tblalunos WHERE RA = '${dadosAlunno.RA}'`;
+            }
+        
+           
+            const resultLibera = await alunoModel.libera(sqlbusca);
+         
+            buscaapi = (resultLibera && resultLibera.length > 0) ? resultLibera[0].RA : dadosAlunno.RA;
+        }
+
+        let cliente;
+        if(pegaNomeDb.NomeCliente == 'dm10fit'){
+            cliente = 10002;
+        } else {
+            cliente = pegaNomeDb.NomeCliente;
+
+        }
+
+        const dadosCatraca = {
             codigoaluno: dadosAlunno.RA,
-            xcliente: pegaNomeDb.NomeCliente,
-            usr_filial: 1
-        });
+            xcliente: cliente,
+            usr_filial: 1,
+            diasTolerancia: resultConf.DiasLiberacaoCatraca,
+            buscaapi: buscaapi
+        } 
+        const acessoService = new AcessoService();
+        const responseCatraca = await acessoService.acessoCatraca(dadosCatraca);
+         
 
         res.status(200).json({ message: 'Evento de check-in recebido' });
     }
@@ -95,25 +126,28 @@ class WebhookController {
         const dbConnection = await connectionDB('dm10fitaccess');
         const clienteModel = new ClienteModel(dbConnection);
 
+
         const pegaNomeDb = await clienteModel.pegaNomeDb({
-            id: data.id
+            id: data.event_data.slot.gym_id
         });
 
         if (!pegaNomeDb) {
             return res.status(404).json({ error: 'Banco de dados do cliente não encontrado' });
         }
 
-        // Trocar a conexão para o banco de dados do cliente
-        const clienteDbConnection = await connectionDB(pegaNomeDb.nomeDB);
-        if (!clienteDbConnection) {
-            return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
-        }
+         await dbConnection.destroy();
+
+         const clienteDbConnection = await connectionDB(pegaNomeDb.NomeBD); 
+         if (!clienteDbConnection) {
+             return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
+         }
 
         //pega os dados do aluno
         const alunoModel = new AlunoModel(clienteDbConnection);
         const dadosAlunno = await alunoModel.getAluno({
-            unique_token: data.user.unique_token
+            unique_token: data.event_data.user.unique_token
         });
+ 
         if (!dadosAlunno) {
             return res.status(500).json({ error: 'Aluno não encontrado' });
         }
@@ -121,16 +155,17 @@ class WebhookController {
         //localiza em qual turma o aluno esta localizado
         const turmaModel = new TurmaModel(clienteDbConnection);
         const getTurmaGrade = await turmaModel.getTurmaGrade({
-            gympass_classid: data.slot.id,
-            gympass_slotid: data.slot.class_id
+            gympass_classid: data.event_data.slot.class_id, 
+            gympass_slotid: data.event_data.slot.id
         });
+
 
         //adiciona a grade da turma do aluno
         const createGradeTurmaAluno = await turmaModel.createGradeTurmaAluno({
             CodGrade: getTurmaGrade.Sequencia,
-            Aluno: dadosAlunno.ra ,
+            Aluno: dadosAlunno.RA ,
             AgendadoPor: 'A', 
-            gympass_bookingnumber: data.slot.booking_number
+            gympass_bookingnumber: data.event_data.slot.booking_number
         });
 
         if (!createGradeTurmaAluno) {
@@ -150,24 +185,28 @@ class WebhookController {
         const dbConnection = await connectionDB('dm10fitaccess');
         const clienteModel = new ClienteModel(dbConnection);
 
+
         const pegaNomeDb = await clienteModel.pegaNomeDb({
-            id: data.id
+            id: data.event_data.slot.gym_id
         });
 
         if (!pegaNomeDb) {
             return res.status(404).json({ error: 'Banco de dados do cliente não encontrado' });
         }
 
+        await dbConnection.destroy();
+
         // Trocar a conexão para o banco de dados do cliente
-        const clienteDbConnection = await connectionDB(pegaNomeDb.nomeDB);
+        const clienteDbConnection = await connectionDB(pegaNomeDb.NomeBD);
         if (!clienteDbConnection) {
             return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
         }
+ 
 
         //pega os dados do aluno
         const alunoModel = new AlunoModel(clienteDbConnection);
         const dadosAlunno = await alunoModel.getAluno({
-            unique_token: data.user.unique_token
+            unique_token: data.event_data.user.unique_token
         });
         if (!dadosAlunno) {
             return res.status(500).json({ error: 'Aluno não encontrado' });
@@ -176,14 +215,14 @@ class WebhookController {
         //localiza a turma do aluno
         const turmaModel = new TurmaModel(clienteDbConnection);
         const getTurmaGrade = await turmaModel.getTurmaGrade({
-            gympass_classid: data.slot.id,
-            gympass_slotid: data.slot.class_id
-        });
+            gympass_classid: data.event_data.slot.class_id,
+            gympass_slotid:  data.event_data.slot.id
+        }); 
 
         //exclui a grade da turma do aluno
         const deleteGradeTurma = await turmaModel.deleteGradeTurma({
             Sequencia: getTurmaGrade.Sequencia,
-            gympass_bookingnumber: data.slot.booking_number
+            gympass_bookingnumber: data.event_data.slot.booking_number
         });
 
         if (!deleteGradeTurma) {

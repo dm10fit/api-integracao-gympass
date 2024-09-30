@@ -8,12 +8,14 @@ class AcessoService {
     async acessoCatraca(data){
 
         try {
-            const url = 'https://app.dm10fit.com.br/ctrFrequenciaManualXHR/ctrFrequenciaManualXHR.php';
+            const url = 'https://app.dm10fit.com.br/ctrFrequenciaManualXHRGympass/ctrFrequenciaManualXHRGympass.php';
             
             const dados = {
                 xcliente: data.xcliente,
                 codigoaluno: data.codigoaluno,
-                usr_filial: data.usr_filial
+                usr_filial: data.usr_filial,
+                diasTolerancia: data.DiasLiberacaoCatraca,
+                buscaapi: data.buscaapi
             };
 
             // Configurações da requisição
