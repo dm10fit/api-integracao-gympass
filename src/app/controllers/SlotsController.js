@@ -47,12 +47,12 @@ class SlotsController {
             const { from, to, gym_id, class_id } = req.body;
 
             // Verifica se from e to estão no formato ISO 8601 e os corrige se necessário
-            const formattedFrom = new Date(from).toISOString();
-            const formattedTo = new Date(to).toISOString();
+            //const formattedFrom = new Date(from).toISOString();
+            //const formattedTo = new Date(to).toISOString();
 
             const data = {
-                from: formattedFrom,
-                to: formattedTo,
+                from: from,
+                to: to,
                 gym_id,
                 class_id
             };

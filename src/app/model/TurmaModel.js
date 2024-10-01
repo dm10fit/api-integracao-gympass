@@ -63,7 +63,7 @@ WHERE CodGrade = ? AND gympass_bookingnumber = ?`, [data.Sequencia, data.gympass
     }
 
     async validaRegistroTurma(data) {
-        const [result] = await this.conn.raw(`select * from tblturmasgradealunos where Aluno = ? and gympass_bookingnumber = ?`, [data.ra, data.gympass_bookingnumber]);
+        const [result] = await this.conn.raw(`select Sequencia from tblturmasgradealunos where Aluno = ? and gympass_bookingnumber = ?`, [data.ra, data.gympass_bookingnumber]);
 
         return result;
     }

@@ -43,7 +43,7 @@ class WebhookController {
         // Trocar a conexão para o banco de dados do cliente
         const clienteDbConnection = await connectionDB(pegaNomeDb.NomeBD);
         if (!clienteDbConnection) {
-            return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
+            return res.status(400).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
         }
 
         // Pega os dados do aluno
@@ -51,6 +51,10 @@ class WebhookController {
         const dadosAlunno = await alunoModel.getAluno({
             unique_token: data.event_data.user.unique_token
         });
+
+        if (!dadosAlunno) {
+            return res.status(400).json({ error: 'Falha ao localizar Aluno' });
+        }
 
         //envia post no gympass que foi feito o checkin
        /* const checkinService = new CheckinService();
@@ -60,7 +64,7 @@ class WebhookController {
         });
 
         if(responseCheckin.metadata.total !== 1){
-            return res.status(500).json({ error: 'erro ao validar no gympass' });
+            return res.status(400).json({ error: 'erro ao validar no gympass' });
         }
         //da baixa na reserva
         const turmaModel = new TurmaModel(clienteDbConnection);
@@ -139,9 +143,10 @@ class WebhookController {
 
          const clienteDbConnection = await connectionDB(pegaNomeDb.NomeBD); 
          if (!clienteDbConnection) {
-             return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
+             return res.status(400).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
          }
 
+        
         //pega os dados do aluno
         const alunoModel = new AlunoModel(clienteDbConnection);
         const dadosAlunno = await alunoModel.getAluno({
@@ -149,16 +154,30 @@ class WebhookController {
         });
  
         if (!dadosAlunno) {
-            return res.status(500).json({ error: 'Aluno não encontrado' });
+            return res.status(400).json({ error: 'Aluno não encontrado' });
         }
 
         //localiza em qual turma o aluno esta localizado
         const turmaModel = new TurmaModel(clienteDbConnection);
+
+        //valida se reserva existe
+        const validaExisteReserva = await turmaModel.validaRegistroTurma({
+            ra: dadosAlunno.RA,
+            gympass_bookingnumber: data.event_data.slot.booking_number
+        })
+        
+        if (validaExisteReserva.length != 0) {
+            return res.status(400).json({ error: 'Reserva ja foi criada' });
+        }
+
         const getTurmaGrade = await turmaModel.getTurmaGrade({
             gympass_classid: data.event_data.slot.class_id, 
             gympass_slotid: data.event_data.slot.id
         });
 
+        if (!getTurmaGrade) {
+            return res.status(400).json({ error: 'Turma não encontrado' });
+        }
 
         //adiciona a grade da turma do aluno
         const createGradeTurmaAluno = await turmaModel.createGradeTurmaAluno({
@@ -169,7 +188,7 @@ class WebhookController {
         });
 
         if (!createGradeTurmaAluno) {
-            return res.status(500).json({ error: 'Falha na solicitação na reserva no banco de dados' });
+            return res.status(400).json({ error: 'Falha na solicitação na reserva no banco de dados' });
         }
 
         res.status(200).json({ message: 'Evento de solicitação de reserva recebido' });
@@ -199,7 +218,7 @@ class WebhookController {
         // Trocar a conexão para o banco de dados do cliente
         const clienteDbConnection = await connectionDB(pegaNomeDb.NomeBD);
         if (!clienteDbConnection) {
-            return res.status(500).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
+            return res.status(400).json({ error: 'Falha ao conectar ao banco de dados do cliente' });
         }
  
 
@@ -209,7 +228,7 @@ class WebhookController {
             unique_token: data.event_data.user.unique_token
         });
         if (!dadosAlunno) {
-            return res.status(500).json({ error: 'Aluno não encontrado' });
+            return res.status(400).json({ error: 'Aluno não encontrado' });
         }
 
         //localiza a turma do aluno
@@ -219,6 +238,10 @@ class WebhookController {
             gympass_slotid:  data.event_data.slot.id
         }); 
 
+        if (!getTurmaGrade) {
+            return res.status(400).json({ error: 'Turma não encontrado' });
+        }
+
         //exclui a grade da turma do aluno
         const deleteGradeTurma = await turmaModel.deleteGradeTurma({
             Sequencia: getTurmaGrade.Sequencia,
@@ -226,7 +249,7 @@ class WebhookController {
         });
 
         if (!deleteGradeTurma) {
-            return res.status(500).json({ error: 'Falha na solicitação de reserva no banco de dados' });
+            return res.status(400).json({ error: 'Falha ao cancelar reserva no banco de dados' });
         }
 
         res.status(200).json({ message: 'Evento de cancelamento de reserva recebido' });
