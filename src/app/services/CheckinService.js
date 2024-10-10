@@ -11,6 +11,8 @@ class CheckinService {
             gympass_id: data.gympass_id
         };
 
+        
+
         return this.sendRequest('POST', '/access/v1/validate', dados, data.gym_id);
     }
 
@@ -21,7 +23,6 @@ class CheckinService {
                 url: `${url}${path}`,
                 headers: {
                     Authorization: `Bearer ${authToken}`,
-                    'Content-Type': 'application/json',
                     'X-Gym-Id': gym_id, 
                 },
                 data,

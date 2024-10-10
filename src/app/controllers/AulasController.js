@@ -1,16 +1,17 @@
 const AulasService = require('../services/AulasService');
-const aulasService = new AulasService();
+const aulasService = new AulasService(); 
+
 class AulasController {
+
+
+    
 
     async CreateAulas(req, res, next) {
         try {
             const data = req.body;
-
-            console.log(data)
-
             const response = await aulasService.criarAula(data);
 
-             
+           
             if (response.error) {
                 return res.status(response.error.status || 400).json({ error: response.error.message || 'Erro ao criar aula' });
             }

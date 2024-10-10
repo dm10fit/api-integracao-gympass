@@ -12,9 +12,9 @@ class AulasService {
                     name: data.nome,
                     description: data.descricao,
                     notes: data.notas,
-                    bookable: data.reservavel,
-                    visible: data.visivel,
-                    is_virtual: data.is_virtual,
+                    bookable: true,
+                    visible: true,
+                    is_virtual: false,
                     product_id: data.product_id
                 }
             ]
@@ -99,11 +99,9 @@ class AulasService {
     async updateAula(data) {
         const dados = {
             name: data.nome,
-            description: data.descricao,
-            notes: data.notas,
-            bookable: data.reservavel,
-            visible: data.visivel,
-            reference: data.reference,
+            description: data.descricao, 
+            bookable: true,
+            visible: true, 
             product_id: data.product_id
         };
 
@@ -113,8 +111,7 @@ class AulasService {
                 url: `${url}/booking/v1/gyms/${data.gym_id}/classes/${data.class_id}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${authToken}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${authToken}`
                 },
                 data: dados,
                 maxBodyLength: Infinity

@@ -9,7 +9,6 @@ class SlotsService {
     async createSlot(data) {
         const dados = {
             occur_date: data.occur_date,
-            
             length_in_minutes: data.length_in_minutes,
             total_capacity: data.total_capacity,
             total_booked: data.total_booked,
@@ -106,7 +105,7 @@ class SlotsService {
         }
     }
 
-    async updateSlot(data, params) {
+    async updateSlot(data) {
         const dados = {
             occur_date: data.occur_date, 
             length_in_minutes: data.length_in_minutes,
@@ -115,10 +114,14 @@ class SlotsService {
             product_id: data.product_id,  
         };
 
+
+        let method = 'PUT';
+        let patch = `${url}/booking/v1/gyms/${data.gym_id}/classes/${data.class_id}/slots/${data.slot_id}`;
+        console.log(patch)
         try {
             const response = await axios({
-                method: 'PUT',
-                url: `${url}/booking/v1/gyms/${params.gym_id}/classes/${params.class_id}/slots/${params.slot_id}`,
+                method: method,
+                url: patch,
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${authToken}`
@@ -133,7 +136,7 @@ class SlotsService {
             
         } catch (error) {
            
-            return  error.response.status;
+            return  error.response.data;
         }
     }
 
