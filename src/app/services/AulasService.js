@@ -99,7 +99,7 @@ class AulasService {
     async updateAula(data) {
         const dados = {
             name: data.nome,
-            description: data.descricao, 
+            description: data.nome, 
             bookable: true,
             visible: true, 
             product_id: data.product_id

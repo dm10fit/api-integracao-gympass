@@ -17,11 +17,14 @@ class WebhookController {
         const body = JSON.stringify(req.body);
         const hmac = crypto.createHmac('sha1', this.secret); 
         const digest = hmac.update(body).digest('hex').toUpperCase(); 
-      
+      console.log(digest)
         return signature === digest; 
     }
 
     async handleCheckin(req, res, next) {
+
+        return res.status(400).json("sucesso");
+
         if (!this.verifySignature(req)) {
             return res.status(403).json({ error: 'Assinatura inválida' });
         }
