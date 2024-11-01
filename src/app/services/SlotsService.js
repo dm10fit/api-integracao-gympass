@@ -117,7 +117,7 @@ class SlotsService {
 
         let method = 'PUT';
         let patch = `${url}/booking/v1/gyms/${data.gym_id}/classes/${data.class_id}/slots/${data.slot_id}`;
-        console.log(patch)
+        
         try {
             const response = await axios({
                 method: method,

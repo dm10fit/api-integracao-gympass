@@ -62,8 +62,20 @@ WHERE CodGrade = ? AND gympass_bookingnumber = ?`, [data.Sequencia, data.gympass
         return result;
     }
 
+    async getTurmaGradeAluno(data){
+        const [result] = await this.conn.raw(`SELECT CodGrade, Data, gympass_bookingnumber FROM tblturmasgradealunos INNER JOIN tblturmasgrade ON tblturmasgradealunos.CodGrade = tblturmasgrade.Sequencia   WHERE DATA = CURDATE() AND Aluno = ?`, [data.aluno]);
+    
+        return result;
+    }
+
     async validaRegistroTurma(data) {
         const [result] = await this.conn.raw(`select Sequencia from tblturmasgradealunos where Aluno = ? and gympass_bookingnumber = ?`, [data.ra, data.gympass_bookingnumber]);
+
+        return result;
+    }
+
+    async validaFrequencia(data){
+        const [result] = await this.conn.raw(`SELECT ra FROM tblfrequencia WHERE RA = ? AND DATA = CURDATE()`, [data.ra]);
 
         return result;
     }

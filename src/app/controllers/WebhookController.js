@@ -23,8 +23,6 @@ class WebhookController {
 
     async handleCheckin(req, res, next) {
 
-        return res.status(400).json("sucesso");
-
         if (!this.verifySignature(req)) {
             return res.status(403).json({ error: 'Assinatura inválida' });
         }
@@ -59,26 +57,31 @@ class WebhookController {
             return res.status(400).json({ error: 'Falha ao localizar Aluno' });
         }
 
-        //envia post no gympass que foi feito o checkin
-       /* const checkinService = new CheckinService();
-        const responseCheckin = await checkinService.ValidateCheckin({
-            gympass_id: data.event_data.user.unique_token,
-            gym_id: data.event_data.gym.id
+        //valida se tem agendamento e da baixa de presenca
+        const turmaModel = new TurmaModel(clienteDbConnection);
+        const GetTurma = await turmaModel.getTurmaGradeAluno({
+            aluno: dadosAlunno.RA
+        });
+ 
+        if(GetTurma.CodGrade){
+        
+            await turmaModel.updateGradeAlunoPresensa({
+                Presenca: 'S',
+                gympass_bookingnumber: GetTurma.gympass_bookingnumber
+            });
+
+        }
+
+        //valida se foi feita a baixa de frequencia no dia
+        const validaFrequencia = await turmaModel.validaFrequencia({
+            ra: dadosAlunno.RA
         });
 
-        if(responseCheckin.metadata.total !== 1){
-            return res.status(400).json({ error: 'erro ao validar no gympass' });
+        if(validaFrequencia){
+            res.status(200).json({ message: 'Aluno ja entrou na academia' });
         }
-        //da baixa na reserva
-        const turmaModel = new TurmaModel(clienteDbConnection);
-        await turmaModel.updateGradeAlunoPresensa({
-            Presenca: 'S',
-            gympass_bookingnumber: data.booking.booking_number
-        });*/
-
 
         //da acesso a catraca da academia e gera a frequencia
-
         const resultConf = await alunoModel.catracaConf();
 
         let sqlbusca;
