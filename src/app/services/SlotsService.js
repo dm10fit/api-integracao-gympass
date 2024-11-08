@@ -37,6 +37,8 @@ class SlotsService {
     }
 
     async getSlot(data) {
+        console.log(data)
+
         try {
             const response = await axios({
                 method: 'GET',
@@ -135,7 +137,7 @@ class SlotsService {
             return response.data;
             
         } catch (error) {
-           
+           //console.log(error)
             return  error.response.data;
         }
     }

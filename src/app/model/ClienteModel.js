@@ -14,6 +14,8 @@ class ClienteModel {
     }
 
     
+
+    
 }
 
 module.exports = ClienteModel;

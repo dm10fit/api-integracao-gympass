@@ -9,9 +9,7 @@ class ReservasService {
     async ValidarReserva(data) {
         const dados = {
             status: data.status,
-            reason: data.reason,
-            reason_category: data.reason_category,
-            virtual_class_url: data.virtual_class_url
+            reason: data.reason
         };
 
         const method = 'PATCH';
@@ -29,16 +27,12 @@ class ReservasService {
                 maxBodyLength: Infinity,
             });
 
-            console.log(JSON.stringify(response.data, null, 2));
+            //console.log(JSON.stringify(response.data, null, 2));
             return response.data;
 
         } catch (error) {
-            if (error.response) {
-                console.error(`Erro [${method} ${path}]:`, error.response.status, error.response.data);
-            } else {
-                console.error(`Erro ao realizar a requisição [${method} ${path}]:`, error.message);
-            }
-            throw error;
+           
+            return error.response.data;
         }
     }
 }
